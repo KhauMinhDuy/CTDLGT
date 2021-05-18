@@ -1,6 +1,8 @@
 #include <iostream>
 #include <iomanip>
 #include "mylib.h"
+#include <fstream> 
+#include <string>
 
 using namespace std;
 
@@ -16,6 +18,32 @@ const char LB = 192;
 const char BT = 193;
 const char TB = 194; 
 
+
+void createTableMonhocs(int x, int y) {
+	SetColor(11);
+	int lenCol1 = 20;
+	int lenCol2 = 30;
+	int lenCol3 = 10;
+	int lenCol4 = 10;
+	gotoxy(x, y);
+	cout << LT << setfill(TT) << setw(lenCol1) << TB << setfill(TT) << setw(lenCol2)
+		<< TB << setfill(TT) << setw(lenCol3) << TB << setfill(TT) << setw(lenCol4) << RT << endl; 
+	y++;
+	for(int i = 1; i < 4; i++) {
+		gotoxy(x, y); y++;
+		cout << DT << setfill(' ') << setw(lenCol1) << DT << setfill(' ') << setw(lenCol2)
+			<<  DT << setfill(' ') << setw(lenCol3) << DT << setfill(' ') << setw(lenCol4) << DT << endl;
+		gotoxy(x, y); y++;
+		cout << LL << setfill(TT) << setw(lenCol1) << CT << setfill(TT) << setw(lenCol2) 
+			<<  CT << setfill(TT) << setw(lenCol3) << CT << setfill(TT) << setw(lenCol4)	<< RR << endl;
+	}
+	gotoxy(x, y); y++;
+	cout << DT << setfill(' ') << setw(lenCol1) << DT << setfill(' ') << setw(lenCol2)
+		<< DT << setfill(' ') << setw(lenCol3) << DT << setfill(' ') << setw(lenCol4)	<< DT << endl;
+	gotoxy(x, y);
+	cout << LB << setfill(TT) << setw(lenCol1) << BT << setfill(TT) << setw(lenCol2) 
+		<< BT << setfill(TT) << setw(lenCol3) << BT << setfill(TT) << setw(lenCol4) << RB << endl;
+}
 
 void printFrame(int width, int height, int x, int y, int color) {
 	SetColor(color);
@@ -253,27 +281,164 @@ void show(LinkedList<T> &linkedlist) {
 	}
 }
 
+// Binary Search Tree
+template <typename T>
+struct NodeTree {
+	int key;
+	T data;
+	NodeTree<T> *left;
+	NodeTree<T> *right;
+};
+
+template <typename T>
+struct BinarySearchTree {
+	NodeTree<T> *root;
+};
+
+template <typename T>
+void newBinarySearchTree(BinarySearchTree<T> &bts) {
+	bts.root = NULL;
+}
+
+template <typename T>
+bool isEmpty(BinarySearchTree<T> &bts) {
+	return bts.root == NULL ? true : false;
+}
+
+template <typename T>
+void insertNode(NodeTree<T> *&nodeTree, int x, T data) {
+	if (nodeTree == NULL) {
+		nodeTree = new NodeTree<T>;
+		nodeTree->key = x;
+		nodeTree->data = data;
+		nodeTree->left = nodeTree->right = NULL;
+		return;
+	} else if (nodeTree->key > x) {
+		insertNode(nodeTree->left, x, data);
+	} else if (nodeTree->key < x) {
+		insertNode(nodeTree->right, x, data);
+	}
+}
+
+template <typename T>
+void add(BinarySearchTree<T> &bts, int x, T data) {
+	insertNode(bts.root, x, data);
+}
+
+template <typename T>
+void inorderNode(NodeTree<T> *root) {
+	if (root != NULL) {
+		inorderNode(root->left);
+		cout << root->data;
+		inorderNode(root->right);
+	}
+}
+
+template <typename T>
+void inorder(BinarySearchTree<T> &bts) {
+	inorderNode(bts.root);
+}
+
+template <typename T>
+NodeTree<T> *minValueNode(NodeTree<T> *root) {
+    while (root->left != NULL) root = root->left;
+    return root;
+}
+
+template <typename T>
+NodeTree<T> *deleteNodeTree(NodeTree<T> *root, int key) {
+	if(root == NULL) return root;
+	else if(key < root->key) {
+		root->left = deleteNodeTree(root->left, key);
+	} else if(key > root->key) {
+		root->right = deleteNodeTree(root->right, key);
+	} else {
+		if(root->left == NULL && root->right == NULL) {
+			delete root;
+			root = NULL;
+		} else if(root->left == NULL) {
+			NodeTree<T> *temp = root;
+			root = root->right;
+			delete temp;
+		} else if(root->right == NULL) {
+			NodeTree<T> *temp = root;
+			root = root->left;
+			delete temp;
+		} else {	
+			NodeTree<T> *temp = minValueNode(root->right);
+			root->key = temp->key;
+			root->data = temp->data;
+			root->right = deleteNodeTree(root->right, temp->key);
+		}
+	}
+		
+	return root;
+}
+template <typename T>
+T get(NodeTree<T> *root, int key) {
+	if(root->key == key) return root->data;
+	if(root->key > key) return get(root->left, key);
+	if(root->key < key) return get(root->right, key);
+}
+
+int arr[1000];
+
+void randomNumber() {
+	for(int i = 0; i < 1000; i++) {
+		arr[i] = i+1;
+	}
+}
+void generateSetOfNumbers()
+{  
+  	int j,temp;
+  	for (int i=999; i>0; --i) {
+	    j = rand() % i;
+	    temp = arr[i];
+	    arr[i] = arr[j];
+	    arr[j] = temp;
+  	}
+
+}
+
+void tokenize(string s, string del = " ")
+{
+    int start = 0;
+    int end = s.find(del);
+    while (end != -1) {
+        cout << s.substr(start, end - start) << endl;
+        start = end + del.size();
+        end = s.find(del, start);
+    }
+    cout << s.substr(start, end - start);
+}
+
+string *tokenize2(string s, string del = " ")
+{
+	string *str = new string[5];
+    int start = 0;
+    int end = s.find(del);
+    int index = 0;
+    while (end != -1) {
+        str[index++] = s.substr(start, end - start);
+        start = end + del.size();
+        end = s.find(del, start);
+    }
+    str[index] = s.substr(start, end - start);
+    return str;
+}
+
 int main() {
 
-	LinkedList<int> lists;
-	newLinkedList(lists);
-	add(lists, 1);
-	addFirst(lists, 2);
-	add(lists, 3);
-	add(lists, 1, 4);
-	show(lists);
+	ifstream ifs;
 	
-	cout << "REMOVE\n" ;
-	remove(lists, 3);
-	show(lists);
+	ifs.open("monhoc.txt", ifstream::in);
+	string line;
+	string *s;
+	while(getline(ifs, line)) {
+		s = tokenize2(line+"\n", ",");
+		cout << s[0] << " " << s[1] << endl;
+	}
 	
-	cout << "\n";
-	
-	add(lists, 5);
-	show(lists);
-	cout << "\n";
-	addFirst(lists, 6);
-	show(lists);
 	
 
 	return 0;
