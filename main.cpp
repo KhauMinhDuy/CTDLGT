@@ -483,10 +483,51 @@ string *split(string s, string del = " ") {
     return str;
 }
 
+int flag_mamh = 0;
+
+template <typename T>
+T searchMaMH(NodeTree<T> *root, char s[10]) {
+	if(root != NULL) {
+		if(strcmp(root->data.maMH, s) == 0) {
+			return root->data;
+		} else if(root->left != NULL) {
+			return searchMaMH(root->left, s);
+		} else if (root->right != NULL) {
+			return searchMaMH(root->right, s);	
+		}
+	}
+}
+
+template <typename T>
+int searchKeyMaMH(NodeTree<T> *root, char s[10]) {
+	if(root != NULL) {
+		if(strcmp(root->data.maMH, s) == 0) {
+			return root->key;
+		} else if(root->left != NULL) {
+			return searchKeyMaMH(root->left, s);
+		} else if (root->right != NULL) {
+			return searchKeyMaMH(root->right, s);	
+		}
+	}
+}
+
+template <typename T>
+void updateMonHoc(NodeTree<T> *root, int key, T data){
+	if(root->key == key) {
+		root->data = data;
+	} else if (root->left != NULL) {
+		updateMonHoc(root->left, key, data);
+	} else if(root->right != NULL) {
+		updateMonHoc(root->right, key, data);
+	}
+}
+
 void processQLMH() {
 	int choose;
 	int size = sizeof(optionQLMH)/sizeof(optionQLMH[0]);
 	do {
+		rowMonhoc = 14;
+		sizeMonhoc = 0;
 		getSizeMonHoc(monhocs.root);
 		system("cls");
 		printTitleQLMH();
@@ -517,9 +558,9 @@ void processQLMH() {
 				fflush(stdin);
 				add(monhocs, arrRandom[keyMonhoc], mh);
 				keyMonhoc++;
-				sizeMonhoc = 0;
+				
 				break;
-			case 1:
+			case 1: {
 				system("cls");
 				printTitleQLMH();
 				printFrame(75, 20, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
@@ -533,8 +574,61 @@ void processQLMH() {
 				cout << "STCLY";
 				gotoxy(31, 27);
 				cout << "STCTH";
+				
+				
+				char mamh[10];
+				MonHoc mh;
+				int key;
+				do {
+					fflush(stdin);
+					gotoxy(31, 17);
+					cout << "Nhap Ma Mon Hoc";
+					gotoxy(52,17);
+					gets(mamh);
+					mh = searchMaMH(monhocs.root, mamh);
+					key = searchKeyMaMH(monhocs.root, mamh);
+					cout << " " << mh.maMH;
+					gotoxy(52,17);
+					cout << "                    ";
+					if (strcmp(mh.maMH, mamh) == 0) { 
+						break;
+					} else {
+						gotoxy(45, 15);
+						cout << "khong tim thay mon hoc";
+						Sleep(1000);
+						gotoxy(45, 15);
+						cout << "                        ";
+					}
+				} while(true);
+				if (strcmp(mh.maMH, mamh) == 0) {
+					gotoxy(52, 21);
+					cout << mh.maMH;
+					gotoxy(52, 23);
+					cout << mh.tenMH;
+					gotoxy(52, 25);
+					cout << mh.STCLY;
+					gotoxy(52, 27);
+					cout << mh.STCTH;
+					Sleep(1000);
+					gotoxy(52, 23);
+					cout << "                        ";
+					gotoxy(52, 23);
+					gets(mh.tenMH);
+					gotoxy(52, 25);
+					cout << "                        ";
+					gotoxy(52, 25);
+					cin >> mh.STCLY;
+					gotoxy(52, 27);
+					cout << "                        ";
+					gotoxy(52, 27);
+					cin >> mh.STCTH;
+					fflush(stdin);
+					updateMonHoc(monhocs.root, key, mh);
+				} 
+				
 				getch();
 				break;
+			}
 			case 2:
 				
 				break;
@@ -554,7 +648,7 @@ void processQLMH() {
 				y+=2;
 				
 				printMonHoc(monhocs.root);
-				rowMonhoc = 14;
+				
 				getch();
 				
 				break;
