@@ -388,8 +388,8 @@ void randomNumber() {
 		arr[i] = i+1;
 	}
 }
-void generateSetOfNumbers()
-{  
+
+void generateSetOfNumbers() {  
   	int j,temp;
   	for (int i=999; i>0; --i) {
 	    j = rand() % i;
@@ -400,8 +400,7 @@ void generateSetOfNumbers()
 
 }
 
-void tokenize(string s, string del = " ")
-{
+void tokenize(string s, string del = " ") {
     int start = 0;
     int end = s.find(del);
     while (end != -1) {
@@ -423,21 +422,40 @@ string *tokenize2(string s, string del = " ")
         start = end + del.size();
         end = s.find(del, start);
     }
+
     str[index] = s.substr(start, end - start);
     return str;
 }
 
 int main() {
 
-	ifstream ifs;
+//	ifstream ifs;
+//	
+//	ifs.open("monhoc.txt", ifstream::in);
+//	string line;
+//	string *s;
+//	while(getline(ifs, line)) {
+//		s = tokenize2(line+"\n", ",");
+//		cout << s[0] << " " << s[1] << endl;
+//	}
+
+	BinarySearchTree<int> bst;
 	
-	ifs.open("monhoc.txt", ifstream::in);
-	string line;
-	string *s;
-	while(getline(ifs, line)) {
-		s = tokenize2(line+"\n", ",");
-		cout << s[0] << " " << s[1] << endl;
-	}
+	newBinarySearchTree(bst);
+	
+	
+	add(bst, 1,1);
+	add(bst, 2,2);
+add(bst, 3,3);
+	add(bst, 4,4);
+	add(bst, 5, 5);
+		add(bst, 6,6);
+	inorder(bst);
+	
+	deleteNodeTree(bst.root, 1);
+	
+	cout << endl;
+	inorder(bst);
 	
 	
 

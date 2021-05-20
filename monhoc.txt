@@ -1,6 +1,7 @@
-140,mmt,mang may tinh,2,1
-354,hdh,he dieu hanh,2,2
-607,anm,an toan mang,2,1
-721,ltw,lap trinh web,2,2
-744,csdl,co so du lieu,2,2
-758,ctdl,cau truc du lieu,2,2
+csdl,co so du lieu,2,2
+ltw,lap trinh web,2,2
+av1.1,anh van 1.1,1,1
+ctdl,cau truc du lieu,2,1
+hdh,he dieu hanh,2,1
+mmt,mang may tinh,2,1
+av2.1,anh van 2.1,2,1

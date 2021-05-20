@@ -35,7 +35,7 @@ const char LB = 192;
 const char BT = 193;
 const char TB = 194; 
 
-int arrRandom[1000];
+int arrRandom[100];
 
 
 // define function
@@ -359,7 +359,7 @@ NodeTree<T> *minValueNode(NodeTree<T> *root) {
 template <typename T>
 NodeTree<T> *deleteNodeTree(NodeTree<T> *root, int key) {
 	if(root == NULL) return root;
-	else if(key < root->key) {
+	if(key < root->key) {
 		root->left = deleteNodeTree(root->left, key);
 	} else if(key > root->key) {
 		root->right = deleteNodeTree(root->right, key);
@@ -483,57 +483,65 @@ string *split(string s, string del = " ") {
     return str;
 }
 
-int flag_mamh = 0;
-
 template <typename T>
-T searchMaMH(NodeTree<T> *root, char s[10]) {
-	if(root != NULL) {
-		if(strcmp(root->data.maMH, s) == 0) {
+T searchMaMH(NodeTree<T> *root, int key) {
+	if(root != NULL) {	
+		if(root->key == key) {
 			return root->data;
-		} else if(root->left != NULL) {
-			return searchMaMH(root->left, s);
-		} else if (root->right != NULL) {
-			return searchMaMH(root->right, s);	
-		}
+		}  	
+	}
+	if(root->key > key) return searchMaMH(root->left, key);
+	if(root->key < key) return searchMaMH(root->right, key);	
+}
+
+string arrMamh[100];
+
+void generateKey(NodeTree<MonHoc> *root) {
+	if(root != NULL) {
+		generateKey(root->left);
+		arrMamh[root->key] = root->data.maMH;
+		generateKey(root->right);
 	}
 }
 
-template <typename T>
+template<typename T>
 int searchKeyMaMH(NodeTree<T> *root, char s[10]) {
-	if(root != NULL) {
-		if(strcmp(root->data.maMH, s) == 0) {
-			return root->key;
-		} else if(root->left != NULL) {
-			return searchKeyMaMH(root->left, s);
-		} else if (root->right != NULL) {
-			return searchKeyMaMH(root->right, s);	
+	for(int i = 0; i < 100; i++) {
+		if(arrMamh[i] == s) {
+			return i;
 		}
 	}
+	return -1;	
 }
 
 template <typename T>
 void updateMonHoc(NodeTree<T> *root, int key, T data){
 	if(root->key == key) {
 		root->data = data;
-	} else if (root->left != NULL) {
+	}  
+	if (root->left != NULL) {
 		updateMonHoc(root->left, key, data);
-	} else if(root->right != NULL) {
+	}  
+	if(root->right != NULL) {
 		updateMonHoc(root->right, key, data);
 	}
 }
 
 void processQLMH() {
+	
 	int choose;
 	int size = sizeof(optionQLMH)/sizeof(optionQLMH[0]);
 	do {
+		generateKey(monhocs.root);
 		rowMonhoc = 14;
 		sizeMonhoc = 0;
+		
 		getSizeMonHoc(monhocs.root);
 		system("cls");
 		printTitleQLMH();
 		choose = printOptionQLMH();
 		switch(choose) {
-			case 0:
+			case 0: {
 				system("cls");
 				printTitleQLMH();
 				printFrame(75, 20, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
@@ -558,8 +566,8 @@ void processQLMH() {
 				fflush(stdin);
 				add(monhocs, arrRandom[keyMonhoc], mh);
 				keyMonhoc++;
-				
 				break;
+			}
 			case 1: {
 				system("cls");
 				printTitleQLMH();
@@ -574,8 +582,7 @@ void processQLMH() {
 				cout << "STCLY";
 				gotoxy(31, 27);
 				cout << "STCTH";
-				
-				
+			
 				char mamh[10];
 				MonHoc mh;
 				int key;
@@ -585,12 +592,48 @@ void processQLMH() {
 					cout << "Nhap Ma Mon Hoc";
 					gotoxy(52,17);
 					gets(mamh);
-					mh = searchMaMH(monhocs.root, mamh);
+					if(strcmp(mamh,"") == 0) {
+						break;
+					}
 					key = searchKeyMaMH(monhocs.root, mamh);
-					cout << " " << mh.maMH;
+					if(key != -1) {
+						mh = searchMaMH(monhocs.root, key);
+					}
+					
+					cout << "mamh = " << mamh;
+					cout << "\nkey = " << key;
+					cout << "\n" << mh.maMH;
 					gotoxy(52,17);
 					cout << "                    ";
-					if (strcmp(mh.maMH, mamh) == 0) { 
+					if (key != -1) {
+						gotoxy(52, 21);
+						cout << mh.maMH;
+						gotoxy(52, 23);
+						cout << mh.tenMH;
+						gotoxy(52, 25);
+						cout << mh.STCLY;
+						gotoxy(52, 27);
+						cout << mh.STCTH;
+						Sleep(1000);
+						gotoxy(52, 23);
+						cout << "                        ";
+						gotoxy(52, 23);
+						gets(mh.tenMH);
+						gotoxy(52, 25);
+						cout << "                        ";
+						gotoxy(52, 25);
+						cin >> mh.STCLY;
+						gotoxy(52, 27);
+						cout << "                        ";
+						gotoxy(52, 27);
+						cin >> mh.STCTH;
+						fflush(stdin);
+						updateMonHoc(monhocs.root, key, mh);
+						gotoxy(45, 10);
+						cout << "Sua Thanh Cong";
+						Sleep(1000);
+						gotoxy(45, 10);
+						cout << "               "; 
 						break;
 					} else {
 						gotoxy(45, 15);
@@ -600,36 +643,58 @@ void processQLMH() {
 						cout << "                        ";
 					}
 				} while(true);
-				if (strcmp(mh.maMH, mamh) == 0) {
-					gotoxy(52, 21);
-					cout << mh.maMH;
-					gotoxy(52, 23);
-					cout << mh.tenMH;
-					gotoxy(52, 25);
-					cout << mh.STCLY;
-					gotoxy(52, 27);
-					cout << mh.STCTH;
-					Sleep(1000);
-					gotoxy(52, 23);
-					cout << "                        ";
-					gotoxy(52, 23);
-					gets(mh.tenMH);
-					gotoxy(52, 25);
-					cout << "                        ";
-					gotoxy(52, 25);
-					cin >> mh.STCLY;
-					gotoxy(52, 27);
-					cout << "                        ";
-					gotoxy(52, 27);
-					cin >> mh.STCTH;
-					fflush(stdin);
-					updateMonHoc(monhocs.root, key, mh);
-				} 
 				
-				getch();
+				
 				break;
 			}
-			case 2:
+			case 2: {
+				system("cls");
+				printTitleQLMH();
+				printFrame(75, 20, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
+				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 4, 1);
+				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 8, 4);
+				int key;
+				char mamh[10];
+				MonHoc mh;
+				do {
+					fflush(stdin);
+					gotoxy(31, 17);
+					cout << "Nhap Ma Mon Hoc";
+					gotoxy(52,17);
+					gets(mamh);
+					if(strcmp(mamh,"") == 0) {
+						break;
+					}
+					key = searchKeyMaMH(monhocs.root, mamh);
+					if(key != -1) {
+						
+						mh = searchMaMH(monhocs.root, key);	
+					}
+					cout << "mamh = " << mamh;
+					cout << "\nkey = " << key;
+					cout << "\n" << mh.maMH;
+					gotoxy(52,17);
+					cout << "                    ";
+					
+					if (key != -1) { 
+						deleteNodeTree(monhocs.root, key);
+						gotoxy(45, 10);
+						cout << "Xoa Thanh Cong";
+						Sleep(1000);
+						gotoxy(45, 10);
+						cout << "               ";
+						break;
+					} else {
+						gotoxy(45, 15);
+						cout << "khong tim thay mon hoc";
+						Sleep(1000);
+						gotoxy(45, 15);
+						cout << "                        ";
+					}
+				} while(true);
+				
+				break;
+			}
 				
 				break;
 			case 3: {
@@ -657,11 +722,14 @@ void processQLMH() {
 				ofs.open("monhoc.txt", ofstream::out);
 				writeFileMonHoc(monhocs.root);
 				ofs.close();
+				gotoxy(45, 10);
+				cout << "Luu Thanh Cong";
+				Sleep(1000);
+				gotoxy(45, 10);
+				cout << "               ";
 				break;
 			}
-				
-			
-				
+		
 		}
 	} while (choose != size - 1);
 }
@@ -799,13 +867,14 @@ void createTable(int x, int y, int row) {
 
 
 void randomNumber() {
-	for(int i = 0; i < 1000; i++) {
+	for(int i = 0; i < 100; i++) {
 		arrRandom[i] = i+1;
 	}
 }
 void generateSetOfNumbers() {  
   	int j,temp;
-  	for (int i=999; i>0; --i) {
+  	for (int i=100; i>0; --i) {
+  		srand (time(NULL));
 	    j = rand() % i;
 	    temp = arrRandom[i];
 	    arrRandom[i] = arrRandom[j];
@@ -857,13 +926,16 @@ int menu() {
 
 template <typename T>
 void writeFileMonHoc(NodeTree<T> *root) {
-	if(root != NULL) {
-		writeFileMonHoc(root->left);
-		ofs << root->key <<"," <<root->data.maMH << "," << root->data.tenMH << "," << root->data.STCLY << ","
-			<< root->data.STCTH << "\n";
-		writeFileMonHoc(root->right);
+	if(root == NULL) {
+		return;
 	}
-
+	ofs << root->data.maMH <<
+		 "," << root->data.tenMH << "," << root->data.STCLY << ","
+			<< root->data.STCTH << "\n";
+	
+	writeFileMonHoc(root->left);
+	writeFileMonHoc(root->right);
+	
 	
 }
 
@@ -873,14 +945,14 @@ void loadDataMonHoc() {
 	ifs.open("monhoc.txt", ifstream::in);
 	string line;
 	string *s;
-	MonHoc mh;
 	while(getline(ifs, line)) {
+		MonHoc mh;
 		s = split(line+"\n", ",");
-		strcpy(mh.maMH, s[1].c_str());
-		strcpy(mh.tenMH, s[2].c_str());
-		mh.STCLY = stoi(s[3]);
-		mh.STCTH = stoi(s[4]);
-		add(monhocs, stoi(s[0]), mh);
+		strcpy(mh.maMH, s[0].c_str());
+		strcpy(mh.tenMH, s[1].c_str());
+		mh.STCLY = stoi(s[2]);
+		mh.STCTH = stoi(s[3]);
+		add(monhocs, arrRandom[keyMonhoc], mh);
 		keyMonhoc++;
 	}
 }
