@@ -37,7 +37,6 @@ const char TB = 194;
 
 int arrRandom[100];
 
-
 // define function
 void printTitleQLMH();
 void printFrameInputMH();
@@ -48,8 +47,6 @@ void createTable(int x, int y, int row);
 void printTitleMH(int width, int x);
 void createTableMonhocs(int x, int y, int row);
 void openwriteMH();
-
-
 
 // datastructe
 
@@ -84,8 +81,6 @@ struct LopTC {
 	int SvMax;
 	SinhVien *sv[100];
 };
-
-
 
 // Danh Sach Tuyen Tinh
 template <typename T>
@@ -287,8 +282,6 @@ void remove(LinkedList<T> &linkedlist, int index) {
 	}
 }
 
-
-
 // Binary Search Tree
 template <typename T>
 struct NodeTree {
@@ -333,8 +326,6 @@ template <typename T>
 void add(BinarySearchTree<T> &bts, int x, T data) {
 	insertNode(bts.root, x, data);
 }
-
-
 
 template <typename T>
 void inorderNode(NodeTree<T> *root) {
@@ -399,7 +390,6 @@ void getSizeMonHoc(NodeTree<T> *root) {
 
 template <typename T>
 void writeFileMonHoc(NodeTree<T> *root);
-
 
 BinarySearchTree<MonHoc> monhocs;
 int keyMonhoc = 0;
@@ -643,8 +633,6 @@ void processQLMH() {
 						cout << "                        ";
 					}
 				} while(true);
-				
-				
 				break;
 			}
 			case 2: {
@@ -774,6 +762,8 @@ void printTitleMH(int width, int x) {
 	}
 }
 
+
+
 void printTitleQLMH() {
 	printFrame(75, 5, COLUMN_FRAME_TITLE, ROW_FRAME_TITLE, COLOR_SL);
 	printTitleMH(75, COLUMN_FRAME_TITLE);	
@@ -873,11 +863,11 @@ void randomNumber() {
 }
 void generateSetOfNumbers() {  
   	int j,temp;
-  	for (int i=100; i>0; --i) {
+  	for (int i=100; i > 0; --i) {
   		srand (time(NULL));
 	    j = rand() % i;
-	    temp = arrRandom[i];
-	    arrRandom[i] = arrRandom[j];
+	    temp = arrRandom[i-1];
+	    arrRandom[i-1] = arrRandom[j];
 	    arrRandom[j] = temp;
   	}
 
@@ -957,6 +947,271 @@ void loadDataMonHoc() {
 	}
 }
 
+string optionQLTC[] = {
+	"1 Them Lop Tin Chi",
+	"2 Sua Lop Tin Chi",
+	"3 Xoa Lop Tin Chi",
+	"4 Danh Sach Lop Tin Chi",
+	"5 Luu Vao File",
+	"6 Quay Lai"
+};
+
+string titlesQLTC[] = {
+	"QUAN LY LOP TIN CHI"
+};
+
+void printTitleTC(int width, int x) {
+	int size = sizeof(titlesQLTC)/sizeof(titlesQLTC[0]);
+	for(int i = 0; i < size; i++) {
+		int len = titlesQLTC[i].length();
+		gotoxy((x+width)/1.6 - len/2 , ROW_FRAME_TITLE + 2 + i);
+		cout << titlesQLTC[i];
+	}
+}
+
+void printTitleQLTC() {
+	printFrame(75, 5, COLUMN_FRAME_TITLE, ROW_FRAME_TITLE, COLOR_SL);
+	printTitleTC(75, COLUMN_FRAME_TITLE);	
+}
+
+int printOptionQLTC() {
+	int choose = 0;
+	printFrame(75, 10, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
+	int size = sizeof(optionQLTC)/sizeof(optionQLTC[0]);
+	int col = COLUMN_FRAME_MENU + 20;
+	int row = ROW_FRAME_MENU + 2;
+	for(int i = 0; i < size; i++) {
+		if(choose == i) {
+			gotoxy(col, row + i);
+			cout << optionQLTC[i];
+		} else {
+			SetColor(COLOR_DF);
+			gotoxy(col, row + i);
+			cout << optionQLTC[i];
+		}
+		
+	}
+	char c;
+	while(true) {
+		c = getch();
+		if(c == UP && choose != 0) {
+			SetColor(COLOR_DF);
+			gotoxy(col, row + choose);
+			cout << optionQLTC[choose--];
+			SetColor(COLOR_SL);
+			gotoxy(col, row + choose);
+			cout << optionQLTC[choose];
+		} else if (c == DOWN && choose != size - 1) {
+			SetColor(COLOR_DF);
+			gotoxy(col, row + choose);
+			cout << optionQLTC[choose++];
+			SetColor(COLOR_SL);
+			gotoxy(col, row + choose);
+			cout << optionQLTC[choose];
+		} else if (c == ENTER) {
+			return choose;
+		}
+	}
+}
+void processQLTC() {
+	int choose;
+	int size = sizeof(optionQLTC)/sizeof(optionQLTC[0]);
+	do {
+		system("cls");
+		printTitleQLTC();
+		choose = printOptionQLTC();
+		switch(choose) {
+			case 0: {
+				system("cls");
+				printTitleQLTC();
+				printFrame(75, 20, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
+				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 2, 4);
+				gotoxy(31, 15);
+				cout << "Ma Mon Hoc";
+				gotoxy(31, 17);
+				cout << "Ten Mon Hoc";
+				gotoxy(31, 19);
+				cout << "STCLY";
+				gotoxy(31, 21);
+				cout << "STCTH";
+				gotoxy(51, 15);
+				MonHoc mh;
+				gets(mh.maMH);
+				gotoxy(51, 17);
+				gets(mh.tenMH);
+				gotoxy(51, 19);
+				cin >> mh.STCLY;
+				gotoxy(51, 21);
+				cin >> mh.STCTH;
+				fflush(stdin);
+				add(monhocs, arrRandom[keyMonhoc], mh);
+				keyMonhoc++;
+				break;
+			}
+			case 1: {
+				system("cls");
+				printTitleQLMH();
+				printFrame(75, 20, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
+				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 4, 1);
+				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 8, 4);
+				gotoxy(31, 21);
+				cout << "Ma Mon Hoc";
+				gotoxy(31, 23);
+				cout << "Ten Mon Hoc";
+				gotoxy(31, 25);
+				cout << "STCLY";
+				gotoxy(31, 27);
+				cout << "STCTH";
+			
+				char mamh[10];
+				MonHoc mh;
+				int key;
+				do {
+					fflush(stdin);
+					gotoxy(31, 17);
+					cout << "Nhap Ma Mon Hoc";
+					gotoxy(52,17);
+					gets(mamh);
+					if(strcmp(mamh,"") == 0) {
+						break;
+					}
+					key = searchKeyMaMH(monhocs.root, mamh);
+					if(key != -1) {
+						mh = searchMaMH(monhocs.root, key);
+					}
+					
+					cout << "mamh = " << mamh;
+					cout << "\nkey = " << key;
+					cout << "\n" << mh.maMH;
+					gotoxy(52,17);
+					cout << "                    ";
+					if (key != -1) {
+						gotoxy(52, 21);
+						cout << mh.maMH;
+						gotoxy(52, 23);
+						cout << mh.tenMH;
+						gotoxy(52, 25);
+						cout << mh.STCLY;
+						gotoxy(52, 27);
+						cout << mh.STCTH;
+						Sleep(1000);
+						gotoxy(52, 23);
+						cout << "                        ";
+						gotoxy(52, 23);
+						gets(mh.tenMH);
+						gotoxy(52, 25);
+						cout << "                        ";
+						gotoxy(52, 25);
+						cin >> mh.STCLY;
+						gotoxy(52, 27);
+						cout << "                        ";
+						gotoxy(52, 27);
+						cin >> mh.STCTH;
+						fflush(stdin);
+						updateMonHoc(monhocs.root, key, mh);
+						gotoxy(45, 10);
+						cout << "Sua Thanh Cong";
+						Sleep(1000);
+						gotoxy(45, 10);
+						cout << "               "; 
+						break;
+					} else {
+						gotoxy(45, 15);
+						cout << "khong tim thay mon hoc";
+						Sleep(1000);
+						gotoxy(45, 15);
+						cout << "                        ";
+					}
+				} while(true);
+				break;
+			}
+			case 2: {
+				system("cls");
+				printTitleQLMH();
+				printFrame(75, 20, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
+				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 4, 1);
+				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 8, 4);
+				int key;
+				char mamh[10];
+				MonHoc mh;
+				do {
+					fflush(stdin);
+					gotoxy(31, 17);
+					cout << "Nhap Ma Mon Hoc";
+					gotoxy(52,17);
+					gets(mamh);
+					if(strcmp(mamh,"") == 0) {
+						break;
+					}
+					key = searchKeyMaMH(monhocs.root, mamh);
+					if(key != -1) {
+						
+						mh = searchMaMH(monhocs.root, key);	
+					}
+					cout << "mamh = " << mamh;
+					cout << "\nkey = " << key;
+					cout << "\n" << mh.maMH;
+					gotoxy(52,17);
+					cout << "                    ";
+					
+					if (key != -1) { 
+						deleteNodeTree(monhocs.root, key);
+						gotoxy(45, 10);
+						cout << "Xoa Thanh Cong";
+						Sleep(1000);
+						gotoxy(45, 10);
+						cout << "               ";
+						break;
+					} else {
+						gotoxy(45, 15);
+						cout << "khong tim thay mon hoc";
+						Sleep(1000);
+						gotoxy(45, 15);
+						cout << "                        ";
+					}
+				} while(true);
+				
+				break;
+			}
+				
+				break;
+			case 3: {
+				listMonhocs();
+				int x = COLUMN_FRAME_MENU + 4;
+				int y = ROW_FRAME_MENU + 2;
+				gotoxy(x, y );
+				cout << "MA MON HOC" << endl;
+				gotoxy(x + 20, y);
+				cout << "TEN MON HOC" << endl;
+				gotoxy(x + 50, y );
+				cout << "STCLT" << endl;
+				gotoxy(x + 60, y );
+				cout << "STCTH" << endl;
+				gotoxy(x + 70, y );
+				y+=2;
+				
+				printMonHoc(monhocs.root);
+				
+				getch();
+				
+				break;
+			}	
+			case 4: {
+				ofs.open("monhoc.txt", ofstream::out);
+				writeFileMonHoc(monhocs.root);
+				ofs.close();
+				gotoxy(45, 10);
+				cout << "Luu Thanh Cong";
+				Sleep(1000);
+				gotoxy(45, 10);
+				cout << "               ";
+				break;
+			}
+		
+		}
+	} while (choose != size - 1);
+}
+
 int main() {
 	randomNumber();
 	generateSetOfNumbers();
@@ -973,8 +1228,7 @@ int main() {
 				processQLMH();
 				break;
 			case 1:
-				gotoxy(COLUMN_RS,ROW_RS);
-				cout << "2";
+				processQLTC();
 				getchar();
 				break;
 			case 2:
