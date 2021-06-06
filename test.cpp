@@ -19,6 +19,7 @@ const char BT = 193;
 const char TB = 194; 
 
 
+
 void createTableMonhocs(int x, int y) {
 	SetColor(11);
 	int lenCol1 = 20;
@@ -426,38 +427,40 @@ string *tokenize2(string s, string del = " ")
     str[index] = s.substr(start, end - start);
     return str;
 }
+string *split(string s, string del = " ") {
+	string *str = new string[5];
+    int start = 0;
+    int end = s.find(del);
+    int index = 0;
+    while (end != -1) {
+        str[index++] = s.substr(start, end - start);
+        start = end + del.size();
+        end = s.find(del, start);
+    }
+    str[index] = s.substr(start, end - start);
+    return str;
+}
+int maLop = 1;
+ifstream ifs_ltc;
+void loadDataLopTinChi() {
+	ifs_ltc.open("ltc.txt", ifstream::in);
+	string line;
+	string *str;
+	while(getline(ifs_ltc, line)) {
+		str = split(line+"\n", ",");
+		cout << str[2] << endl;
+//		cout << str[1] << endl;
+//		cout << str[2] << endl;
+//		cout << str[3] << endl;
+//		cout << str[4] << endl;
+	}
+}
 
 int main() {
 
-//	ifstream ifs;
-//	
-//	ifs.open("monhoc.txt", ifstream::in);
-//	string line;
-//	string *s;
-//	while(getline(ifs, line)) {
-//		s = tokenize2(line+"\n", ",");
-//		cout << s[0] << " " << s[1] << endl;
-//	}
-
-	BinarySearchTree<int> bst;
-	
-	newBinarySearchTree(bst);
+loadDataLopTinChi();
 	
 	
-	add(bst, 1,1);
-	add(bst, 2,2);
-add(bst, 3,3);
-	add(bst, 4,4);
-	add(bst, 5, 5);
-		add(bst, 6,6);
-	inorder(bst);
-	
-	deleteNodeTree(bst.root, 1);
-	
-	cout << endl;
-	inorder(bst);
-	
-	
-
+getch();
 	return 0;
 }
