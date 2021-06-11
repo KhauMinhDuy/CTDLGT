@@ -428,7 +428,7 @@ string *tokenize2(string s, string del = " ")
     return str;
 }
 string *split(string s, string del = " ") {
-	string *str = new string[5];
+	string *str = new string[10];
     int start = 0;
     int end = s.find(del);
     int index = 0;
@@ -443,12 +443,17 @@ string *split(string s, string del = " ") {
 int maLop = 1;
 ifstream ifs_ltc;
 void loadDataLopTinChi() {
-	ifs_ltc.open("ltc.txt", ifstream::in);
+	ifs_ltc.open("loptinchi.txt", ifstream::in);
 	string line;
 	string *str;
 	while(getline(ifs_ltc, line)) {
 		str = split(line+"\n", ",");
+		cout << str[0] << endl;
+		cout << str[1] << endl;
 		cout << str[2] << endl;
+		cout << str[3] << endl;
+		cout << str[4] << endl;
+		cout << str[5] << endl;
 //		cout << str[1] << endl;
 //		cout << str[2] << endl;
 //		cout << str[3] << endl;
@@ -458,9 +463,9 @@ void loadDataLopTinChi() {
 
 int main() {
 
-loadDataLopTinChi();
+	loadDataLopTinChi();
 	
 	
-getch();
+	getch();
 	return 0;
 }

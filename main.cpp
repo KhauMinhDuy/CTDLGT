@@ -453,7 +453,7 @@ void printMonHoc(NodeTree<MonHoc> *root) {
 ofstream ofs;
 
 string *split(string s, string del = " ") {
-	string *str = new string[5];
+	string *str = new string[10];
     int start = 0;
     int end = s.find(del);
     int index = 0;
@@ -848,6 +848,38 @@ void createTableMonhocs(int x, int y, int row) {
 		<< BT << setfill(TT) << setw(lenCol3) << BT << setfill(TT) << setw(lenCol4) << RB << endl;
 }
 
+void createTableLTC(int x, int y, int row) {
+	SetColor(11);
+	int lenCol1 = 20;
+	int lenCol2 = 20;
+	int lenCol3 = 10;
+	int lenCol4 = 10;
+	int lenCol5 = 10;
+	gotoxy(x, y);
+	cout << LT << setfill(TT) << setw(lenCol1) << TB << setfill(TT) << setw(lenCol2)
+		<< TB << setfill(TT) << setw(lenCol3) << TB << setfill(TT) << setw(lenCol4)
+		<< TB << setfill(TT) << setw(lenCol5)  << RT << endl; 
+	y++;
+	for(int i = 1; i <= row+1; i++) {
+		gotoxy(x, y); y++;
+		cout << DT << setfill(' ') << setw(lenCol1) << DT << setfill(' ') << setw(lenCol2)
+			<<  DT << setfill(' ') << setw(lenCol3) << DT << setfill(' ') << setw(lenCol4)
+			<< DT << setfill(' ') << setw(lenCol4) << DT << endl;
+		gotoxy(x, y); y++;
+		cout << LL << setfill(TT) << setw(lenCol1) << CT << setfill(TT) << setw(lenCol2) 
+			<<  CT << setfill(TT) << setw(lenCol3) << CT << setfill(TT) << setw(lenCol4)
+			<< CT << setfill(TT) << setw(lenCol4) << RR << endl;
+	}
+	gotoxy(x, y); y++;
+	cout << DT << setfill(' ') << setw(lenCol1) << DT << setfill(' ') << setw(lenCol2)
+		<< DT << setfill(' ') << setw(lenCol3) << DT << setfill(' ') << setw(lenCol4)
+		<< DT << setfill(' ') << setw(lenCol4) << DT << endl;
+	gotoxy(x, y);
+	cout << LB << setfill(TT) << setw(lenCol1) << BT << setfill(TT) << setw(lenCol2) 
+		<< BT << setfill(TT) << setw(lenCol3) << BT << setfill(TT) << setw(lenCol4) 
+		<< BT << setfill(TT) << setw(lenCol4) << RB << endl;
+}
+
 void createTable(int x, int y, int row) {
 	SetColor(11);
 	int lenCol1 = 20;
@@ -1110,6 +1142,22 @@ void loadDataLopTinChi() {
 	}
 }
 
+void printLopTC() {
+	int row = 16;
+	for(int i = 0, size = lopTinChis.size; i < size; i++) {
+		gotoxy(23, row);
+		cout << get(lopTinChis, i)->maMH;
+		gotoxy(43, row);
+		cout << get(lopTinChis, i)->niemKhoa;
+		gotoxy(63, row);
+		cout << get(lopTinChis, i)->hocKi;
+		gotoxy(73, row);
+		cout << get(lopTinChis, i)->SvMin;
+		gotoxy(83, row);
+		cout << get(lopTinChis, i)->SvMax;
+		row+=2;
+	}
+}
 
 void processQLTC() {
 	int choose;
@@ -1452,13 +1500,22 @@ void processQLTC() {
 			case 3: {
 				system("cls");
 				printTitleQLTC();
-				createTableMonhocs(COLUMN_FRAME_MENU + 2, ROW_FRAME_MENU + 1, lopTinChis.size);
-				gotoxy(51, 11);	
-				cout << lopTinChis.array[0].maLop << " | " << lopTinChis.array[0].maMH << " | " << lopTinChis.array[0].SvMin;
+				createTableLTC(COLUMN_FRAME_MENU + 2, ROW_FRAME_MENU + 1, lopTinChis.size);
+				gotoxy(23, 14);	
+				cout << "Ma Mon Hoc";
+				gotoxy(43, 14);	
+				cout << "Niem Khoa";
+				gotoxy(63, 14);	
+				cout << "Hoc Ky";
+				gotoxy(73, 14);	
+				cout << "Sv Min";
+				gotoxy(83, 14);	
+				cout << "Sv Max";
+				printLopTC();
 				getch();
-				
 				break;
 			}	
+			
 			case 4: {
 				ofs_ltc.open("loptinchi.txt", ofstream::out);
 				writeFileLopTinChi(lopTinChis);
