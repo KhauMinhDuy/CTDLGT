@@ -384,7 +384,6 @@ void getSizeMonHoc(NodeTree<T> *&root) {
 	}
 }
 
-
 BinarySearchTree<MonHoc> monhocs;
 ArrayList<LopTC> lopTinChis;
 int keyMonhoc = 0;
@@ -667,9 +666,7 @@ void processQLMH() {
 			case 2: {
 				system("cls");
 				printTitleQLMH();
-//				printFrame(75, 20, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
 				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 4, 1);
-//				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 8, 4);
 				int key;
 				char mamh[10];
 				MonHoc mh;
@@ -880,6 +877,39 @@ void createTableLTC(int x, int y, int row) {
 		<< BT << setfill(TT) << setw(lenCol4) << RB << endl;
 }
 
+void createTableDSSV(int x, int y, int row) {
+	SetColor(11);
+	int lenCol1 = 20;
+	int lenCol2 = 20;
+	int lenCol3 = 20;
+	int lenCol4 = 20;
+	int lenCol5 = 20;
+	int lenCol6 = 20;
+	gotoxy(x, y);
+	cout << LT << setfill(TT) << setw(lenCol1) << TB << setfill(TT) << setw(lenCol2)
+		<< TB << setfill(TT) << setw(lenCol3) << TB << setfill(TT) << setw(lenCol4)
+		<< TB << setfill(TT) << setw(lenCol5) << TB << setfill(TT) << setw(lenCol6) << RT << endl; 
+	y++;
+	for(int i = 1; i <= row+1; i++) {
+		gotoxy(x, y); y++;
+		cout << DT << setfill(' ') << setw(lenCol1) << DT << setfill(' ') << setw(lenCol2)
+			<<  DT << setfill(' ') << setw(lenCol3) << DT << setfill(' ') << setw(lenCol4)
+			<< DT << setfill(' ') << setw(lenCol5)  << DT << setfill(' ') << setw(lenCol6) << DT << endl;
+		gotoxy(x, y); y++;
+		cout << LL << setfill(TT) << setw(lenCol1) << CT << setfill(TT) << setw(lenCol2) 
+			<<  CT << setfill(TT) << setw(lenCol3) << CT << setfill(TT) << setw(lenCol4)
+			<< CT << setfill(TT) << setw(lenCol5)  << CT << setfill(TT) << setw(lenCol6) << RR << endl;
+	}
+	gotoxy(x, y); y++;
+	cout << DT << setfill(' ') << setw(lenCol1) << DT << setfill(' ') << setw(lenCol2)
+		<< DT << setfill(' ') << setw(lenCol3) << DT << setfill(' ') << setw(lenCol4)
+		<< DT << setfill(' ') << setw(lenCol5) << DT << setfill(' ') << setw(lenCol6) << DT << endl;
+	gotoxy(x, y);
+	cout << LB << setfill(TT) << setw(lenCol1) << BT << setfill(TT) << setw(lenCol2) 
+		<< BT << setfill(TT) << setw(lenCol3) << BT << setfill(TT) << setw(lenCol4) 
+		<< BT << setfill(TT) << setw(lenCol5) << BT << setfill(TT) << setw(lenCol6) << RB << endl;
+}
+
 void createTable(int x, int y, int row) {
 	SetColor(11);
 	int lenCol1 = 20;
@@ -975,12 +1005,14 @@ void loadDataMonHoc() {
 }
 
 string optionQLTC[] = {
-	"1 Them Lop Tin Chi",
-	"2 Sua Lop Tin Chi",
-	"3 Xoa Lop Tin Chi",
-	"4 Danh Sach Lop Tin Chi",
-	"5 Luu Vao File",
-	"6 Quay Lai"
+	"1. Them Lop Tin Chi",
+	"2. Sua Lop Tin Chi",
+	"3. Xoa Lop Tin Chi",
+	"4. Danh Sach Lop Tin Chi",
+	"5. Danh Sach Sinh Vien Cua Mot Lop Tin Chi",
+	"6. Quan Ly Sinh Vien Cua Lop Tin Chi",
+	"7. Luu Vao File",
+	"8. Quay Lai"
 };
 
 string titlesQLTC[] = {
@@ -1003,7 +1035,7 @@ void printTitleQLTC() {
 
 int printOptionQLTC() {
 	int choose = 0;
-	printFrame(75, 10, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
+	printFrame(75, 15, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
 	int size = sizeof(optionQLTC)/sizeof(optionQLTC[0]);
 	int col = COLUMN_FRAME_MENU + 20;
 	int row = ROW_FRAME_MENU + 2;
@@ -1088,14 +1120,6 @@ bool isSvMin(int svmin) {
 	return true;
 }
 
-bool findMaLTC(ArrayList<LopTC> &ltc, int malop) {
-	for(int i = 0, size = ltc.size; i < size ; i++) {
-		if(ltc.array[i].maLop == malop) return true;
-	}
-	return false;
-}
-
-
 int binarySearch(LopTC arr[], int l, int r, int maLop) {
     if (r >= l) {
         int mid = (r + l) / 2;
@@ -1106,6 +1130,19 @@ int binarySearch(LopTC arr[], int l, int r, int maLop) {
     }
     return -1;
 }
+
+
+bool findMaLTC(ArrayList<LopTC> &ltc, int malop) {
+//	for(int i = 0, size = ltc.size; i < size ; i++) {
+//		if(ltc.array[i].maLop == malop) return true;
+//	}
+//	return false;
+	int index = binarySearch(lopTinChis.array, 0 , lopTinChis.size - 1, malop);
+	if(index>=0) return true;
+	return false;
+}
+
+
 
 ofstream ofs_ltc;
 void writeFileLopTinChi(ArrayList<LopTC> &ltc) {
@@ -1155,6 +1192,28 @@ void printLopTC() {
 		cout << get(lopTinChis, i)->SvMax;
 		row+=2;
 	}
+}
+
+void printDSSV_LTC() {
+	int row = 16;
+	for(int i = 0, size = lopTinChis.size; i < size; i++) {
+		gotoxy(23, row);
+		cout << get(lopTinChis, i)->maMH;
+		gotoxy(43, row);
+		cout << get(lopTinChis, i)->niemKhoa;
+		gotoxy(63, row);
+		cout << get(lopTinChis, i)->hocKi;
+		gotoxy(73, row);
+		cout << get(lopTinChis, i)->SvMin;
+		gotoxy(83, row);
+		cout << get(lopTinChis, i)->SvMax;
+		row+=2;
+	}
+}
+
+
+bool checkMaLTC(ArrayList<LopTC> &ltc, int maTC) {
+
 }
 
 void processQLTC() {
@@ -1514,6 +1573,45 @@ void processQLTC() {
 			}	
 			
 			case 4: {
+				system("cls");
+				printTitleQLTC();
+				createTableDSSV(COLUMN_FRAME_MENU -10, ROW_FRAME_MENU + 1, 10);
+				gotoxy(11, 14);	
+				cout << "Ma Sinh Vien";
+				gotoxy(31, 14);	
+				cout << "Ho";
+				gotoxy(51, 14);	
+				cout << "Ten";
+				gotoxy(71, 14);	
+				cout << "Phai";
+				gotoxy(91, 14);	
+				cout << "So Dien Thoai";
+				gotoxy(111, 14);	
+				cout << "Ma Lop";
+				Sleep(1000);
+				break;
+			}
+			
+			case 5: {
+				system("cls");
+				printTitleQLTC();
+				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU, 1);
+				gotoxy(31, 13);
+				cout << "Nhap Ma Lop Tin Chi";
+				
+				int maLTC;
+				do {
+					gotoxy(51,13);
+					cin >> maLTC;
+					
+				} while(true);
+				
+				
+				getch();
+				break;
+			}
+			
+			case 6: {
 				ofs_ltc.open("loptinchi.txt", ofstream::out);
 				writeFileLopTinChi(lopTinChis);
 				ofs_ltc.close();
