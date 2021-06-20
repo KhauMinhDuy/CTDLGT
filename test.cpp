@@ -3,6 +3,7 @@
 #include "mylib.h"
 #include <fstream> 
 #include <string>
+#include <stdexcept>
 
 using namespace std;
 
@@ -461,11 +462,70 @@ void loadDataLopTinChi() {
 	}
 }
 
-int main() {
 
-	loadDataLopTinChi();
+char name[10];
+
+char *testReturnCharArray() {
+	char arrayChar[10];
+	cin >> arrayChar;
+	return arrayChar;
+}
+
+void enterSVMax() {
+	do {
+		string s_svMax;
+		gotoxy(51, 13);	
+		cout << "                             ";
+		gotoxy(51, 13);
+		getline(cin, s_svMax);
+		try {
+	        int res = stoi(s_svMax);
+	        cout << "Integer: " << res << endl;
+	        break;
+	    } catch(invalid_argument e) {
+	        cout << "Caught Invalid Argument Exception\n";
+	    }					
+	} while (true);
+}
+
+void swap(MonHoc &mh1, MonHoc &mh2){
+	MonHoc mh = mh1;
+	mh1 = mh2;
+	mh2 = mh;
 	
+}
+
+int partition (MonHoc arr[], int low, int high)
+{
+    MonHoc pivot = arr[high];
+    int i = (low - 1);
+ 
+    for (int j = low; j <= high - 1; j++){
+        if (arr[j].tenMH < pivot.tenMH){
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i + 1], arr[high]);
+    return (i + 1);
+}
+
+void quickSort(MonHoc arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+
+int main() {
 	
+//	loadDataLopTinChi();
+	
+//	char *name = testReturnCharArray();
+//	cout << name;
+	enterSVMax();
 	getch();
 	return 0;
 }

@@ -3,6 +3,7 @@
 #include <string>
 #include <string.h>
 #include <fstream>
+#include <stdexcept>
 #include "mylib.h"
 
 using namespace std;
@@ -23,6 +24,7 @@ using namespace std;
 #define DOWN 80
 #define ENTER 13
 
+#define MAX_MH 1000
 #define MAX_LTC 10000
 
 const char TT = 196; 
@@ -37,7 +39,7 @@ const char LB = 192;
 const char BT = 193;
 const char TB = 194; 
 
-int arrRandom[100];
+
 
 void printTitleQLMH();
 void printFrameInputMH();
@@ -373,6 +375,8 @@ NodeTree<T> *deleteNodeTree(NodeTree<T> *root, int key) {
 	return root;
 }
 
+int arrRandom[100];
+
 int sizeMonhoc = 0;
 
 template <typename T>
@@ -400,19 +404,13 @@ string titlesQLMH[] = {
 };
 
 string optionQLMH[] = {
-	"1 Them MH",
-	"2 Sua MH",
-	"3 Xoa MH",
-	"4 Danh Sach Mon Hoc",
-	"5 Luu Vao File",
-	"6 Quay Lai"
-};
-
-string menus[] = {
-	"1. Quan ly Mon Hoc",
-	"2. Quan Ly Lop Tin Chi",
-	"3. Quan Ly Sinh Vien",
-	"4. Thoat"
+	"1. Them MH",
+	"2. Sua MH",
+	"3. Xoa MH",
+	"4. Danh Sach Mon Hoc",
+	"5. Danh Sach Mon Hoc Tang Dan Theo Ten",
+	"6. Luu Vao File",
+	"7. Quay Lai"
 };
 
 string optionMH[] = {
@@ -422,14 +420,22 @@ string optionMH[] = {
 	"Option 4"
 };
 
+string menus[] = {
+	"1. Quan ly Mon Hoc",
+	"2. Quan Ly Lop Tin Chi",
+	"3. Quan Ly Sinh Vien",
+	"4. Thoat"
+};
+
+
 void listMonhocs() {
 	system("cls");
 	printTitleQLMH();
 	createTableMonhocs(COLUMN_FRAME_MENU + 2, ROW_FRAME_MENU + 1, sizeMonhoc);	
 }
 
-int rowMonhoc = 14;
 
+int rowMonhoc = 14;
 void printMonHoc(NodeTree<MonHoc> *root) {
 	if(root != NULL) {
 		printMonHoc(root->left);
@@ -448,6 +454,8 @@ void printMonHoc(NodeTree<MonHoc> *root) {
 		rowMonhoc+=2;
 	}
 }
+
+
 
 ofstream ofs;
 
@@ -476,15 +484,61 @@ MonHoc searchMaMH(NodeTree<MonHoc> *root, int key) {
 }
 
 string arrMamh[100];
-MonHoc arrayToBST[100];
-int indexArrayBST = 0;
+MonHoc BtsToArray[100];
 
+int indexArrayBST = 0;
 void generateKey(NodeTree<MonHoc> *&root) {
 	if(root != NULL) {
 		generateKey(root->left);
 		arrMamh[root->key] = root->data.maMH;
-		arrayToBST[indexArrayBST++] = root->data;
+		BtsToArray[indexArrayBST++] = root->data;
 		generateKey(root->right);
+	}
+}
+
+void swap(MonHoc &mh1, MonHoc &mh2){
+	MonHoc mh = mh1;
+	mh1 = mh2;
+	mh2 = mh;
+}
+
+int partition (MonHoc *arr, int low, int high){
+    MonHoc pivot = arr[high];    // pivot
+    int left = low;
+    int right = high - 1;
+    while(true){
+        while(left <= right && strcmp(arr[left].tenMH, pivot.tenMH) < 0) left++;
+        while(right >= left && strcmp(arr[right].tenMH, pivot.tenMH) > 0) right--;
+        if (left >= right) break;
+        swap(arr[left], arr[right]);
+        left++;
+        right--;
+    }
+    swap(arr[left], arr[high]);
+    return left;
+}
+
+void quickSort(MonHoc *arr, int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+void printMonHoc(MonHoc *mh) {
+	quickSort(BtsToArray, 0, indexArrayBST);
+	int size = sizeof(mh)/sizeof(mh[0]);
+	for (int i = 0; i <= indexArrayBST; i++) {
+		gotoxy(24, rowMonhoc);
+		cout << mh[i].maMH;
+		gotoxy(44, rowMonhoc);
+		cout << mh[i].tenMH;
+		gotoxy(74, rowMonhoc);
+		cout << mh[i].STCLY;
+		gotoxy(84, rowMonhoc);
+		cout << mh[i].STCTH;
+		rowMonhoc+=2;
 	}
 }
 
@@ -519,20 +573,17 @@ void writeFileMonHoc(NodeTree<MonHoc> *&root) {
 	writeFileMonHoc(root->right);
 }
 
-NodeTree<MonHoc> *newNode(MonHoc data) 
-{ 
+NodeTree<MonHoc> *newNode(MonHoc data) { 
     NodeTree<MonHoc> *node = new NodeTree<MonHoc>();
     node->key = searchKeyMaMH(data.maMH);
     node->data = data; 
     node->left = NULL; 
     node->right = NULL; 
-  
     return node; 
 } 
 
 void balanceBST(NodeTree<MonHoc> *&root, MonHoc arr[], int start, int end) { 
-    if (start > end) 
-    return; 
+    if (start > end) return; 
 
     int mid = (start + end)/2; 
     root = newNode(arr[mid]); 
@@ -541,6 +592,124 @@ void balanceBST(NodeTree<MonHoc> *&root, MonHoc arr[], int start, int end) {
     balanceBST(root->right,arr, mid + 1, end); 
 }
 
+bool isSTCLT(int stclt) {
+	return (stclt < 0 || stclt > 4) ? false : true;
+}
+
+bool isSTCTH(int stcth) {
+	return (stcth < 0 || stcth > 4) ? false : true;
+}
+
+void enterMaMH(MonHoc &mh, int row) {
+	do {
+		string s_maMh;
+		gotoxy(51, row);
+		cout << "                            ";
+		gotoxy(51, row);				
+		getline(cin, s_maMh);
+		
+		if(s_maMh.length() <= 10) {
+			strcpy(mh.maMH, s_maMh.c_str());
+			int key = searchKeyMaMH(mh.maMH);
+			if(key != -1) {
+				gotoxy(45, 11);	
+				cout << "Ma Mon Hoc Da Ton Tai";
+				Sleep(1000);
+				gotoxy(45, 11);	
+				cout << "                              ";
+			} else {
+				break;
+			}
+			
+		} else {
+			gotoxy(45, 11);	
+			cout << "Ma Mon Hoc Khong Qua 10 Ku Tu";
+			Sleep(1000);
+			gotoxy(45, 11);	
+			cout << "                              ";
+		}
+		
+	} while (true);
+}
+
+void enterTenMH(MonHoc &mh, int row) {
+	do {
+		string s_tenMh;
+		gotoxy(51, row);
+		cout << "                            ";
+		gotoxy(51, row);				
+		getline(cin, s_tenMh);
+		if(s_tenMh.length() <= 50) {
+			strcpy(mh.tenMH, s_tenMh.c_str());
+			break;
+		} else {
+			gotoxy(45, 11);	
+			cout << "Ma Mon Hoc Khong Qua 50 Ku Tu";
+			Sleep(1000);
+			gotoxy(45, 11);	
+			cout << "                              ";
+		}
+		
+	} while (true);
+}
+
+void enterSTCLT(MonHoc &mh, int row) {
+	do {
+		string s_stclt;
+		gotoxy(51, row);
+		cout << "                            ";
+		gotoxy(51, row);				
+		getline(cin, s_stclt);
+		try {
+	        mh.STCLY = stoi(s_stclt);
+	        if(isSTCLT(mh.STCLY)) {
+				break;
+			} else {
+				gotoxy(45, 11);	
+				cout << "STCLT Khong Hop Le";
+				Sleep(1000);
+				gotoxy(45, 11);	
+				cout << "                           ";
+			}	
+	    } catch(invalid_argument e) {
+	        gotoxy(45, 11);	
+			cout << "STCLT Khong Hop Le";
+			Sleep(1000);
+			gotoxy(45, 11);	
+			cout << "                           ";
+	    }
+	} while(true);
+}
+
+void enterSTCTH(MonHoc &mh, int row) {
+	do {
+		string s_stcth;
+		gotoxy(51, row);
+		cout << "                            ";
+		gotoxy(51, row);				
+		getline(cin, s_stcth);
+		try {
+	        mh.STCTH = stoi(s_stcth);
+	        if(isSTCTH(mh.STCTH)) {
+				break;
+			} else {
+				gotoxy(45, 11);	
+				cout << "STCTH Khong Hop Le";
+				Sleep(1000);
+				gotoxy(45, 11);	
+				cout << "                           ";
+			}	
+	    } catch(invalid_argument e) {
+	        gotoxy(45, 11);	
+			cout << "Nhom Khong Hop Le";
+			Sleep(1000);
+			gotoxy(45, 11);	
+			cout << "                           ";
+	    }
+	} while(true);
+}
+
+
 void processQLMH() {
 	
 	int choose;
@@ -548,8 +717,8 @@ void processQLMH() {
 	do {
 		indexArrayBST = 0;
 		generateKey(monhocs.root);
-		balanceBST(monhocs.root, arrayToBST, 0, indexArrayBST - 1);
-		rowMonhoc = 14;
+		balanceBST(monhocs.root, BtsToArray, 0, indexArrayBST - 1);
+		rowMonhoc = 14;    // position first row
 		sizeMonhoc = 0;
 		getSizeMonHoc(monhocs.root);
 		system("cls");
@@ -557,7 +726,7 @@ void processQLMH() {
 		choose = printOptionQLMH();
 		switch(choose) {
 			
-			case 0: {
+			case 0: {   // Them MH
 				system("cls");
 				printTitleQLMH();
 				printFrame(75, 20, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
@@ -570,22 +739,18 @@ void processQLMH() {
 				cout << "STCLY";
 				gotoxy(31, 21);
 				cout << "STCTH";
-				gotoxy(51, 15);
+				
 				MonHoc mh;
-				gets(mh.maMH);
-				gotoxy(51, 17);
-				gets(mh.tenMH);
-				gotoxy(51, 19);
-				cin >> mh.STCLY;
-				gotoxy(51, 21);
-				cin >> mh.STCTH;
-				fflush(stdin);
+				enterMaMH(mh, 15);
+				enterTenMH(mh, 17);
+				enterSTCLT(mh, 19);
+				enterSTCTH(mh, 21);
 				add(monhocs, arrRandom[keyMonhoc], mh);
 				keyMonhoc++;
 				break;
 			}
 			
-			case 1: {
+			case 1: { // sua mon hoc
 				system("cls");
 				printTitleQLMH();
 				printFrame(75, 20, COLUMN_FRAME_MENU, ROW_FRAME_MENU, COLOR_SL);
@@ -607,7 +772,7 @@ void processQLMH() {
 					fflush(stdin);
 					gotoxy(31, 17);
 					cout << "Nhap Ma Mon Hoc";
-					gotoxy(52,17);
+					gotoxy(51,17);
 					gets(mamh);
 					if(strcmp(mamh,"") == 0) {
 						break;
@@ -617,33 +782,27 @@ void processQLMH() {
 						mh = searchMaMH(monhocs.root, key);
 					}
 					
-					cout << "mamh = " << mamh;
-					cout << "\nkey = " << key;
-					cout << "\n" << mh.maMH;
-					gotoxy(52,17);
+					gotoxy(51,17);
 					cout << "                    ";
 					if (key != -1) {
-						gotoxy(52, 21);
+						gotoxy(51, 21);
 						cout << mh.maMH;
-						gotoxy(52, 23);
+						gotoxy(51, 23);
 						cout << mh.tenMH;
-						gotoxy(52, 25);
+						gotoxy(51, 25);
 						cout << mh.STCLY;
-						gotoxy(52, 27);
+						gotoxy(51, 27);
 						cout << mh.STCTH;
 						Sleep(1000);
-						gotoxy(52, 23);
+						gotoxy(51, 23);
 						cout << "                        ";
-						gotoxy(52, 23);
-						gets(mh.tenMH);
-						gotoxy(52, 25);
+						enterTenMH(mh, 23);
+						gotoxy(51, 25);
 						cout << "                        ";
-						gotoxy(52, 25);
-						cin >> mh.STCLY;
-						gotoxy(52, 27);
+						enterSTCLT(mh, 25);
+						gotoxy(51, 27);
 						cout << "                        ";
-						gotoxy(52, 27);
-						cin >> mh.STCTH;
+						enterSTCTH(mh, 27);
 						fflush(stdin);
 						updateMonHoc(monhocs.root, key, mh);
 						gotoxy(45, 10);
@@ -663,7 +822,7 @@ void processQLMH() {
 				break;
 			}
 			
-			case 2: {
+			case 2: { // xoa mon hoc
 				system("cls");
 				printTitleQLMH();
 				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 4, 1);
@@ -704,7 +863,7 @@ void processQLMH() {
 				break;
 			}
 						
-			case 3: {
+			case 3: { // danh sach mon hoc
 				listMonhocs();
 				int x = COLUMN_FRAME_MENU + 4;
 				int y = ROW_FRAME_MENU + 2;
@@ -723,7 +882,26 @@ void processQLMH() {
 				break;
 			}
 				
-			case 4: {
+			case 4: { // danh sach tang theo ten
+				listMonhocs();
+				int x = COLUMN_FRAME_MENU + 4;
+				int y = ROW_FRAME_MENU + 2;
+				gotoxy(x, y );
+				cout << "MA MON HOC" << endl;
+				gotoxy(x + 20, y);
+				cout << "TEN MON HOC" << endl;
+				gotoxy(x + 50, y );
+				cout << "STCLT" << endl;
+				gotoxy(x + 60, y );
+				cout << "STCTH" << endl;
+				gotoxy(x + 70, y );
+				y+=2;
+				printMonHoc(BtsToArray);
+				getch();
+				break;
+				break;
+			}	
+			case 5: { // luu danh sach mon hoc
 				ofs.open("monhoc.txt", ofstream::out);
 				writeFileMonHoc(monhocs.root);
 				ofs.close();
@@ -847,34 +1025,41 @@ void createTableMonhocs(int x, int y, int row) {
 
 void createTableLTC(int x, int y, int row) {
 	SetColor(11);
+	int lenCol0 = 10;
 	int lenCol1 = 20;
 	int lenCol2 = 20;
 	int lenCol3 = 10;
 	int lenCol4 = 10;
 	int lenCol5 = 10;
+	int lenCol6 = 10;
 	gotoxy(x, y);
-	cout << LT << setfill(TT) << setw(lenCol1) << TB << setfill(TT) << setw(lenCol2)
-		<< TB << setfill(TT) << setw(lenCol3) << TB << setfill(TT) << setw(lenCol4)
-		<< TB << setfill(TT) << setw(lenCol5)  << RT << endl; 
+	cout << LT << setfill(TT) << setw(lenCol0) << TB << setfill(TT) << setw(lenCol1) << TB 
+		<< setfill(TT) << setw(lenCol2) << TB << setfill(TT) << setw(lenCol3) << TB 
+		<< setfill(TT) << setw(lenCol4) << TB << setfill(TT) << setw(lenCol5) << TB
+		<< setfill(TT) << setw(lenCol6) << RT << endl; 
 	y++;
 	for(int i = 1; i <= row+1; i++) {
 		gotoxy(x, y); y++;
-		cout << DT << setfill(' ') << setw(lenCol1) << DT << setfill(' ') << setw(lenCol2)
-			<<  DT << setfill(' ') << setw(lenCol3) << DT << setfill(' ') << setw(lenCol4)
-			<< DT << setfill(' ') << setw(lenCol4) << DT << endl;
+		cout << DT << setfill(' ') << setw(lenCol0) << DT << setfill(' ') << setw(lenCol1) 
+			<< DT << setfill(' ') << setw(lenCol2) <<  DT << setfill(' ') << setw(lenCol3) 
+			<< DT << setfill(' ') << setw(lenCol4) << DT << setfill(' ') << setw(lenCol5) 
+			<< DT << setfill(' ') << setw(lenCol6) << DT << endl;
 		gotoxy(x, y); y++;
-		cout << LL << setfill(TT) << setw(lenCol1) << CT << setfill(TT) << setw(lenCol2) 
-			<<  CT << setfill(TT) << setw(lenCol3) << CT << setfill(TT) << setw(lenCol4)
-			<< CT << setfill(TT) << setw(lenCol4) << RR << endl;
+		cout << LL << setfill(TT) << setw(lenCol0) << CT << setfill(TT) << setw(lenCol1) 
+			<< CT << setfill(TT) << setw(lenCol2) <<  CT << setfill(TT) << setw(lenCol3) 
+			<< CT << setfill(TT) << setw(lenCol4) << CT << setfill(TT) << setw(lenCol5) 
+			<< CT << setfill(TT) << setw(lenCol6) << RR << endl;
 	}
 	gotoxy(x, y); y++;
-	cout << DT << setfill(' ') << setw(lenCol1) << DT << setfill(' ') << setw(lenCol2)
-		<< DT << setfill(' ') << setw(lenCol3) << DT << setfill(' ') << setw(lenCol4)
-		<< DT << setfill(' ') << setw(lenCol4) << DT << endl;
+	cout << DT << setfill(' ') << setw(lenCol0) << DT << setfill(' ') << setw(lenCol1) 
+		<< DT << setfill(' ') << setw(lenCol2) << DT << setfill(' ') << setw(lenCol3) 
+		<< DT << setfill(' ') << setw(lenCol4) << DT << setfill(' ') << setw(lenCol5) 
+		<< DT << setfill(' ') << setw(lenCol6)  << DT << endl;
 	gotoxy(x, y);
-	cout << LB << setfill(TT) << setw(lenCol1) << BT << setfill(TT) << setw(lenCol2) 
-		<< BT << setfill(TT) << setw(lenCol3) << BT << setfill(TT) << setw(lenCol4) 
-		<< BT << setfill(TT) << setw(lenCol4) << RB << endl;
+	cout << LB << setfill(TT) << setw(lenCol0) << BT << setfill(TT) << setw(lenCol1) 
+		<< BT << setfill(TT) << setw(lenCol2) << BT << setfill(TT) << setw(lenCol3) 
+		<< BT << setfill(TT) << setw(lenCol4) << BT << setfill(TT) << setw(lenCol5) 
+		<< BT << setfill(TT) << setw(lenCol6) << RB << endl;
 }
 
 void createTableDSSV(int x, int y, int row) {
@@ -1090,7 +1275,7 @@ string arrHocKi[] = {
 	"1", "2", "3", "hk1", "hk2", "hk3"
 };
 
-bool isHocKi(char hocKi[]) {
+bool isHocKi(char hocKi[3]) {
 	int size = sizeof(arrHocKi)/sizeof(arrHocKi[0]);
 	for(int i = 0; i < size; i++) {
 		if(arrHocKi[i] == hocKi ) return true;
@@ -1131,12 +1316,7 @@ int binarySearch(LopTC arr[], int l, int r, int maLop) {
     return -1;
 }
 
-
 bool findMaLTC(ArrayList<LopTC> &ltc, int malop) {
-//	for(int i = 0, size = ltc.size; i < size ; i++) {
-//		if(ltc.array[i].maLop == malop) return true;
-//	}
-//	return false;
 	int index = binarySearch(lopTinChis.array, 0 , lopTinChis.size - 1, malop);
 	if(index>=0) return true;
 	return false;
@@ -1146,12 +1326,11 @@ bool findMaLTC(ArrayList<LopTC> &ltc, int malop) {
 
 ofstream ofs_ltc;
 void writeFileLopTinChi(ArrayList<LopTC> &ltc) {
-	
 	for(int i = 0, size = ltc.size; i < size; i++) {
 		ofs_ltc << ltc.array[i].maLop << "," << ltc.array[i].maMH << "," << 
-			ltc.array[i].niemKhoa << "," << ltc.array[i].nhom << "," <<
-			ltc.array[i].SvMin << "," << ltc.array[i].SvMax << "," <<
-			ltc.array[i].huyLop << "\n";
+			ltc.array[i].niemKhoa << "," << ltc.array[i].hocKi<< "," << 
+			ltc.array[i].nhom << "," << ltc.array[i].SvMin << "," << 
+			ltc.array[i].SvMax << "," << ltc.array[i].huyLop << "\n";
 	}
 }
 
@@ -1169,9 +1348,10 @@ void loadDataLopTinChi() {
 		strcpy(ltc.maMH, str[1].c_str());
 		ltc.niemKhoa = stoi(str[2]);
 		strcpy(ltc.hocKi, str[3].c_str());
-		ltc.SvMin = stoi(str[4]);
-		ltc.SvMax = stoi(str[5]);
-		ltc.huyLop = stoi(str[6]);
+		ltc.nhom = stoi(str[4]);
+		ltc.SvMin = stoi(str[5]);
+		ltc.SvMax = stoi(str[6]);
+		ltc.huyLop = stoi(str[7]);
 		ltc.sv = new SinhVien[ltc.SvMax];
 		add(lopTinChis, ltc);
 	}
@@ -1180,6 +1360,8 @@ void loadDataLopTinChi() {
 void printLopTC() {
 	int row = 16;
 	for(int i = 0, size = lopTinChis.size; i < size; i++) {
+		gotoxy(13, row);
+		cout << get(lopTinChis, i)->maLop;
 		gotoxy(23, row);
 		cout << get(lopTinChis, i)->maMH;
 		gotoxy(43, row);
@@ -1190,6 +1372,8 @@ void printLopTC() {
 		cout << get(lopTinChis, i)->SvMin;
 		gotoxy(83, row);
 		cout << get(lopTinChis, i)->SvMax;
+		gotoxy(93, row);
+		cout << get(lopTinChis, i)->nhom;
 		row+=2;
 	}
 }
@@ -1211,9 +1395,172 @@ void printDSSV_LTC() {
 	}
 }
 
-
 bool checkMaLTC(ArrayList<LopTC> &ltc, int maTC) {
 
+}
+
+bool enterMaMH(LopTC &ltc) {
+	do {
+		gotoxy(51, 15);	
+		cout << "                             ";
+		gotoxy(51, 15);	
+		gets(ltc.maMH);	
+		int key = searchKeyMaMH(ltc.maMH);
+		if(strcmp(ltc.maMH,"") == 0) return true;
+		if(key != -1) {			
+			break;
+		} else {
+			gotoxy(45, 13);	
+			cout << "khong tim thay ma mon hoc";
+			Sleep(1000);
+			gotoxy(45, 13);	
+			cout << "                           ";
+		}
+	} while (true);
+}
+
+void enterNiemKhoa(LopTC &ltc, int row) {
+	do {
+		string s_niemKhoa;
+		gotoxy(51, row);	
+		cout << "                             ";
+		gotoxy(51, row);
+		getline(cin, s_niemKhoa);
+		try {
+	        ltc.niemKhoa = stoi(s_niemKhoa);
+	        if(isNiemKhoa(ltc.niemKhoa)) {
+				break;
+			} else {
+				gotoxy(45, 11);	
+				cout << "Niem Khoa Khong Hop Le";
+				Sleep(1000);
+				gotoxy(45, 11);	
+				cout << "                           ";
+			}	
+	    } catch(invalid_argument e) {
+	        gotoxy(45, 11);	
+			cout << "Niem Khoa Khong Hop Le";
+			Sleep(1000);
+			gotoxy(45, 11);	
+			cout << "                           ";
+	    }
+		
+	} while (true);
+}
+
+void enterHocKi(LopTC &ltc, int row) {
+	do {
+		string s_hocki;
+		gotoxy(51, row);	
+		cout << "                             ";
+		gotoxy(51, row);
+		getline(cin, s_hocki);
+		if(s_hocki.length() <= 3) {
+			strcpy(ltc.hocKi, s_hocki.c_str());
+		} else {
+			gotoxy(45, 11);	
+			cout << "Hoc Ki Khong Hop Le";
+			Sleep(1000);
+			gotoxy(45, 11);	
+			cout << "                           ";
+			continue;	
+		}
+		if(isHocKi(ltc.hocKi)) {
+			break;
+		} else {
+			gotoxy(45, 11);	
+			cout << "Hoc Ki Khong Hop Le";
+			Sleep(1000);
+			gotoxy(45, 11);	
+			cout << "                           ";
+		}
+		
+	} while (true);
+}
+
+void enterNhom(LopTC &ltc, int row) {
+	do {
+		string s_nhom;
+		gotoxy(51, row);	
+		cout << "                             ";
+		gotoxy(51, row);
+		getline(cin, s_nhom);
+		try {
+	        ltc.nhom = stoi(s_nhom);
+	        if(isNhom(ltc.nhom)) {
+				break;
+			} else {
+				gotoxy(45, 11);	
+				cout << "Nhom Khong Hop Le";
+				Sleep(1000);
+				gotoxy(45, 11);	
+				cout << "                           ";
+			}	
+	    } catch(invalid_argument e) {
+	        gotoxy(45, 11);	
+			cout << "Nhom Khong Hop Le";
+			Sleep(1000);
+			gotoxy(45, 11);	
+			cout << "                           ";
+	    }
+						
+	} while (true);
+}
+
+void enterSVMin(LopTC &ltc, int row) {
+	do {
+		string s_svMin;
+		gotoxy(51, row);	
+		cout << "                             ";
+		gotoxy(51, row);
+		getline(cin, s_svMin);
+		try {
+	        ltc.SvMin = stoi(s_svMin);
+	        if(isSvMin(ltc.SvMin)) {
+	        	break;
+			} else {
+				gotoxy(45, 11);	
+				cout << "Sinh Vien Min Khong Hop Le";
+				Sleep(1000);
+				gotoxy(45, 11);	
+				cout << "                           ";	
+			}
+	    } catch(invalid_argument e) {
+	        gotoxy(45, 11);	
+			cout << "Sinh Vien Min Khong Hop Le";
+			Sleep(1000);
+			gotoxy(45, 11);	
+			cout << "                           ";
+	    }				
+	} while (true);
+}
+
+void enterSVMax(LopTC &ltc, int row) {
+	do {
+		string s_svMax;
+		gotoxy(51, row);	
+		cout << "                             ";
+		gotoxy(51, row);
+		getline(cin, s_svMax);
+		try {
+	        ltc.SvMax = stoi(s_svMax);
+	        if(isSvMax(ltc.SvMax, ltc.SvMin)) {
+	        	break;
+			} else {
+				gotoxy(45, 11);	
+				cout << "Sinh Vien Max Khong Hop Le";
+				Sleep(1000);
+				gotoxy(45, 11);	
+				cout << "                           ";	
+			}
+	    } catch(invalid_argument e) {
+	        gotoxy(45, 11);	
+			cout << "Sinh Vien Max Khong Hop Le";
+			Sleep(1000);
+			gotoxy(45, 11);	
+			cout << "                           ";
+	    }				
+	} while (true);
 }
 
 void processQLTC() {
@@ -1246,117 +1593,19 @@ void processQLTC() {
 				LopTC ltc;
 				bool exit = false;
 				
-				do {
-					gotoxy(51, 15);	
-					cout << "                             ";
-					gotoxy(51, 15);	
-					gets(ltc.maMH);	
-					int key = searchKeyMaMH(ltc.maMH);
-					if(strcmp(ltc.maMH,"") == 0) exit = true;
-					if(key != -1) {			
-						break;
-					} else {
-						gotoxy(45, 13);	
-						cout << "khong tim thay ma mon hoc";
-						Sleep(1000);
-						gotoxy(45, 13);	
-						cout << "                           ";
-					}
-				} while (true);
-				
-				do {
-					if(exit) break;
-					gotoxy(51, 17);	
-					cout << "                             ";
-					gotoxy(51, 17);
-					cin >> ltc.niemKhoa;
-					fflush(stdin);
-					if(isNiemKhoa(ltc.niemKhoa)) {
-						break;
-					} else {
-						gotoxy(45, 13);	
-						cout << "Niem Khoa Khong Hop Le";
-						Sleep(1000);
-						gotoxy(45, 13);	
-						cout << "                           ";
-					}
-				} while (true);
-				
-				do {
-					if(exit) break;
-					gotoxy(51, 19);	
-					cout << "                             ";
-					gotoxy(51, 19);
-					gets(ltc.hocKi);
-					if(isHocKi(ltc.hocKi)) {
-						break;
-					} else {
-						gotoxy(45, 13);	
-						cout << "Hoc Ki Khong Hop Le";
-						Sleep(1000);
-						gotoxy(45, 13);	
-						cout << "                           ";
-					}
-					
-				} while (true);
-				
-				do {
-					if(exit) break;
-					gotoxy(51, 21);	
-					cout << "                             ";
-					gotoxy(51, 21);
-					cin >> ltc.nhom;
-					if(isNhom(ltc.nhom)) {
-						break;
-					} else {
-						gotoxy(45, 13);	
-						cout << "Nhom Khong Hop Le";
-						Sleep(1000);
-						gotoxy(45, 13);	
-						cout << "                           ";
-					}					
-				} while (true);
-				
-				do {
-					if(exit) break;
-					gotoxy(51, 23);	
-					cout << "                             ";
-					gotoxy(51, 23);
-					cin >> ltc.SvMin;
-					fflush(stdin);
-					if(isSvMin(ltc.SvMin)) {
-						break;
-					} else {
-						gotoxy(45, 13);	
-						cout << "Sinh Vien Min Khong Hop Le";
-						Sleep(1000);
-						gotoxy(45, 13);	
-						cout << "                           ";
-					}					
-				} while (true);
-				
-				do {
-					if(exit) break;
-					gotoxy(51, 25);	
-					cout << "                             ";
-					gotoxy(51, 25);
-					cin >> ltc.SvMax;
-					fflush(stdin);
-					if(isSvMax(ltc.SvMax, ltc.SvMin)) {
-						break;
-					} else {
-						gotoxy(45, 13);	
-						cout << "Sinh Vien Max Khong Hop Le";
-						Sleep(1000);
-						gotoxy(45, 13);	
-						cout << "                           ";
-					}					
-				} while (true);
-				ltc.maLop = maLop++;
-				ltc.huyLop = false;
-				ltc.sv = new SinhVien[ltc.SvMax];
-				add(lopTinChis, ltc);
-				gotoxy(51, 35);
+				exit = enterMaMH(ltc);
+				if(!exit) {
+					enterNiemKhoa(ltc, 17);
+					enterHocKi(ltc, 19);
+					enterNhom(ltc, 21);
+					enterSVMin(ltc, 23);
+					enterSVMax(ltc, 25);
+					ltc.maLop = ++maLop; // default value malop = 1
+					ltc.huyLop = false;
+					ltc.sv = new SinhVien[ltc.SvMax];
+					add(lopTinChis, ltc);
+					gotoxy(51, 35);	
+				}
 				break;
 			}
 			
@@ -1434,88 +1683,11 @@ void processQLTC() {
 					}
 				} while (true);
 				
-				do {
-					gotoxy(51, 19);	
-					cout << "                             ";
-					gotoxy(51, 19);
-					cin >> ltc->niemKhoa;
-					fflush(stdin);
-					if(isNiemKhoa(ltc->niemKhoa)) {
-						break;
-					} else {
-						gotoxy(45, 11);	
-						cout << "Niem Khoa Khong Hop Le";
-						Sleep(1000);
-						gotoxy(45, 11);	
-						cout << "                           ";
-					}
-				} while (true);
-				
-				do {
-					gotoxy(51, 21);	
-					cout << "                             ";
-					gotoxy(51, 21);
-					gets(ltc->hocKi);
-					if(isHocKi(ltc->hocKi)) {
-						break;
-					} else {
-						gotoxy(45, 11);	
-						cout << "Hoc Ki Khong Hop Le";
-						Sleep(1000);
-						gotoxy(45, 11);	
-						cout << "                           ";
-					}					
-				} while (true);
-				
-				do {
-					gotoxy(51, 23);	
-					cout << "                             ";
-					gotoxy(51, 23);
-					cin >> ltc->nhom;
-					if(isNhom(ltc->nhom)) {
-						break;
-					} else {
-						gotoxy(45, 11);	
-						cout << "Nhom Khong Hop Le";
-						Sleep(1000);
-						gotoxy(45, 11);	
-						cout << "                           ";
-					}					
-				} while (true);
-				
-				do {
-					gotoxy(51, 25);	
-					cout << "                             ";
-					gotoxy(51, 25);
-					cin >> ltc->SvMin;
-					fflush(stdin);
-					if(isSvMin(ltc->SvMin)) {
-						break;
-					} else {
-						gotoxy(45, 11);	
-						cout << "Sinh Vien Min Khong Hop Le";
-						Sleep(1000);
-						gotoxy(45, 11);	
-						cout << "                           ";
-					}					
-				} while (true);
-				
-				do {
-					gotoxy(51, 27);	
-					cout << "                             ";
-					gotoxy(51, 27);
-					cin >> ltc->SvMax;
-					fflush(stdin);
-					if(isSvMax(ltc->SvMax, ltc->SvMin)) {
-						break;
-					} else {
-						gotoxy(45, 11);	
-						cout << "Sinh Vien Max Khong Hop Le";
-						Sleep(1000);
-						gotoxy(45, 11);	
-						cout << "                           ";
-					}					
-				} while (true);
+				enterNiemKhoa(*ltc, 19);
+				enterHocKi(*ltc, 21);
+				enterNhom(*ltc, 23);	
+				enterSVMin(*ltc, 25);
+				enterSVMax(*ltc, 27);
 				break;
 			}
 			
@@ -1556,7 +1728,9 @@ void processQLTC() {
 			case 3: {
 				system("cls");
 				printTitleQLTC();
-				createTableLTC(COLUMN_FRAME_MENU + 2, ROW_FRAME_MENU + 1, lopTinChis.size);
+				createTableLTC(COLUMN_FRAME_MENU - 8, ROW_FRAME_MENU + 1, lopTinChis.size);
+				gotoxy(13, 14);	
+				cout << "Ma Lop TC";
 				gotoxy(23, 14);	
 				cout << "Ma Mon Hoc";
 				gotoxy(43, 14);	
@@ -1567,10 +1741,12 @@ void processQLTC() {
 				cout << "Sv Min";
 				gotoxy(83, 14);	
 				cout << "Sv Max";
+				gotoxy(93, 14);	
+				cout << "Nhom";
 				printLopTC();
 				getch();
 				break;
-			}	
+			}
 			
 			case 4: {
 				system("cls");
