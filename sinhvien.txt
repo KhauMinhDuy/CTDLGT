@@ -1,9 +1,8 @@
-n16dcat014,khau minh,duy,m,1234567891,n16cqat01-n
-n16dcat015,nguyen van,a,m,1234567891,n16cqat01-n
-n16dcat016,nguyen van,b,m,1234567891,n16cqat01-n
-n16dcat017,nguyen van,c,m,1234567891,n16cqat01-n
-n16dcat018,nguyen van,d,m,1234567891,n16cqat01-n
-n16dcat019,nguyen van,e,m,1234567891,n16cqat01-n
-n16dcat020,nguyen van,f,m,1234567891,n16cqat01-n
-n16dcat021,nguyen van,g,m,1234567891,n16cqat01-n
-
+n16dcat014,khau minh,duy,m,1234567891,d16cqat01,
+n16dcat015,nguyen van,a,m,1234567891,d16cqat01,
+n16dcat016,nguyen van,b,m,1234567891,d16cqat01,
+n16dcat017,nguyen van,c,m,1234567891,d16cqat01,
+n16dcat018,nguyen van,d,m,1234567891,d16cqat01,
+n16dcat019,nguyen van,e,m,1234567891,d16cqat01,
+n16dcat020,nguyen van,f,m,1234567891,d16cqat01,
+n16dcat021,nguyen van,g,m,1234567891,d16cqat01,
