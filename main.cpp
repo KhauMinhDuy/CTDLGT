@@ -1263,6 +1263,21 @@ void loadDataMonHoc() {
 	}
 }
 
+ifstream ifs_dk;
+void loadDataDangKy() {
+	ifs_dk.open("dangky.txt", ifstream::in);
+	string line;
+	string *s;
+	while(getline(ifs_dk, line)) {
+		DangKy dk;
+		s = split(line+"\n", ",");
+		strcpy(dk.maSV, s[0].c_str());
+		dk.diem = stof(s[1]);
+		dk.maLop = stof(s[2]);
+		add(dangkys, dk);
+	}
+}
+
 string optionQLTC[] = {
 	"1. Them Lop Tin Chi",
 	"2. Sua Lop Tin Chi",
@@ -1753,13 +1768,19 @@ void addDK() {
 		for(int j = 0, size2 = ltc->sv.size; j < size2; j++) {
 			DangKy dk;
 			SinhVien *sv = get(ltc->sv, j);
-			strcmp(dk.maSV, sv->maSV);
+			strcpy(dk.maSV, sv->maSV);
 			dk.maLop = ltc->maLop;
 			dk.diem = 0;
 			add(dangkys, dk);
 		}
 		
-	}	
+	}
+	
+//	for(int j = 0, size = dangkys.size; j < size; j++) {
+//			DangKy *dk = get(dangkys, j);
+//			cout << dk->maLop << " | masv " << dk->maSV << " | diem " << dk->diem << "\n";
+//	}
+//	getch();	
 }
 
 void printTitleBangDiem() {
@@ -1781,13 +1802,12 @@ void printTitleBangDiem() {
 void processQLTC() {
 	int choose;
 	int size = sizeof(optionQLTC)/sizeof(optionQLTC[0]);
+//	addDK();
 	do {
 		generateKey(monhocs.root);
 		system("cls");
 		printTitleQLTC();
 		choose = printOptionQLTC();
-		
-		addDK();
 		
 		switch(choose) {
 			
@@ -2239,27 +2259,10 @@ void processQLTC() {
 				
 				if(exit) break;
 				
-//				ArrayList<DangKy> temp;
-//				newArrayList(temp, 1000);
-//			
-//				for(int i = 0, size = lopTinChis.size; i < size; i++) {
-//			
-//					LopTC *ltc2 = get(lopTinChis, i);
-//					for(int j = 0, size2 = dangkys.size; j < size2; j++ ) {
-//						DangKy *dk = get(dangkys, j);
-//						if(dk->maLop == ltc2->maLop) {
-//							add(temp, *dk);
-//						}
-//					}
-//				}
-				
 				
 				exit =false;
 				do {
-					
-					
 					system("cls");
-					cout << dangkys.size;
 					printTitleQLTC();
 					createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 2, 2);
 					gotoxy(31, 15);
@@ -2295,7 +2298,7 @@ void processQLTC() {
 						
 						for(int j = 0, size2 = dangkys.size; j < size2; j++) {
 							DangKy *dk = get(dangkys, j);
-							if(strcmp(sv->maSV, dk->maSV) && ltc_sv->maLop == dk->maLop) {
+							if(strcmp(sv->maSV, dk->maSV) == 0 && ltc_sv->maLop == dk->maLop) {
 								gotoxy(91, row_sv_ltc);
 								cout << dk->diem ;
 							}
@@ -2305,8 +2308,8 @@ void processQLTC() {
 					}
 					
 					
+					
 					char maSV[15];
-					int indexSV;
 					do {
 						fflush(stdin);
 						gotoxy(51, 15);	
@@ -2316,7 +2319,6 @@ void processQLTC() {
 						if(strcmp(maSV, "") == 0) exit = true;
 						if(exit) break;
 						if(findMaSV(maSV)) {
-							indexSV = getIndexMaSV(maSV);
 							break;
 						} else {
 							gotoxy(45, 11);	
@@ -2330,7 +2332,6 @@ void processQLTC() {
 					if(exit) break;
 					
 					if(strcmp(maSV, "") == 0) break;
-					SinhVien *sv = get(sinhviens, indexSV);
 				
 					float diem = 0;
 					do {
@@ -2339,7 +2340,7 @@ void processQLTC() {
 						cout << "                             ";
 						gotoxy(51, 17);
 						cin >> diem;
-						if(diem >10 || diem < 0) {
+						if(diem > 10 || diem < 0) {
 							gotoxy(45, 11);	
 							cout << "Diem Khong Hop Le";
 							Sleep(1000);
@@ -2350,22 +2351,21 @@ void processQLTC() {
 						}
 											
 					} while (true);
-			
+
 					for(int i = 0, size = dangkys.size; i < size; i++) {
 						DangKy *dk = get(dangkys, i);
-						if(strcmp(dk->maSV, maSV) == 0 && dk->maLop == ltc_sv->maLop) {
-							dk->diem = 9;
+						if( (strcmp(maSV, dk->maSV) == 0 ) && (dk->maLop == ltc_sv->maLop)) {
+							dk->diem = diem;
 						}
 					}
 				} while(!exit);
 				
-			
-				getch();
 				break;
 			}
 			
 			case 7: {
 				system("cls");
+					
 				printTitleQLTC();
 				createTable(COLUMN_FRAME_MENU + 10, ROW_FRAME_MENU + 2, 4);
 				
@@ -2418,6 +2418,7 @@ void processQLTC() {
 				gotoxy(91, 13);	
 				cout << "Diem";
 				int stt= 1;
+				
 				int row_sv_ltc = 15;
 				for(int i = 0, size = ltc_sv->sv.size; i < size; i++) {
 					SinhVien *sv = get(ltc_sv->sv, i);
@@ -2429,13 +2430,13 @@ void processQLTC() {
 					cout << sv->ho;
 					gotoxy(71, row_sv_ltc);
 					cout << sv->ten;
-					
+
 					for(int j = 0, size2 = dangkys.size; j < size2; j++) {
 						DangKy *dk = get(dangkys, j);
-						if(strcmp(sv->maSV, dk->maSV) && ltc_sv->maLop == dk->maLop) {
+						if(strcmp(sv->maSV, dk->maSV) == 0 && ltc_sv->maLop == dk->maLop) {
 							gotoxy(91, row_sv_ltc);
 							cout << dk->diem ;
-						}
+						} 
 					}
 					
 					row_sv_ltc+=2;
@@ -3229,6 +3230,7 @@ int main() {
 	loadDataMonHoc();
 	loadDataLopTinChi();
 	loadDataDSSinhVien();
+	loadDataDangKy();
 	
 	int choose; 
 	do {
