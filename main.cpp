@@ -76,8 +76,6 @@ struct DangKy {
 	int maLop;
 };
 
-
-
 template <typename T>
 struct ArrayList {
 	int member;
